@@ -1,7 +1,6 @@
 use byte_unit::Byte;
 use chrono::NaiveDateTime;
 use scraper::{Html, Selector};
-use tracing::info;
 
 /// The type of Hack, with Other being used as a fallback in case new types are added on the fly.
 #[derive(Debug)]
@@ -71,7 +70,7 @@ pub struct Hack {
 }
 
 impl Hack {
-    pub fn from_scraped_hack_lists(list_view: Html) -> Vec<Self> {
+    pub fn from_scraped_hack_lists(list_view: Html, gallery_view: Html) -> Vec<Self> {
         let list_selector = Selector::parse("div.content > table > tbody > tr").unwrap();
 
         list_view
@@ -259,6 +258,24 @@ impl Hack {
 
                 let download_url = format!("https:{}", download_url);
 
+                let screenshot_selector =
+                    Selector::parse(&format!(r#"a[href="/?p=section&a=details&id={}""#, id))
+                        .unwrap();
+
+                let screenshot = gallery_view
+                    .select(&screenshot_selector)
+                    .next()
+                    .unwrap()
+                    .first_child()
+                    .unwrap()
+                    .value()
+                    .as_element()
+                    .unwrap()
+                    .attr("src")
+                    .unwrap();
+
+                let screenshot = format!("http:{}", screenshot);
+
                 Hack {
                     id,
                     name,
@@ -272,7 +289,7 @@ impl Hack {
                     rating,
                     size,
                     download_url,
-                    screenshot_urls: Vec::new(),
+                    screenshot_urls: vec![screenshot],
                     tags: None,
                 }
             })

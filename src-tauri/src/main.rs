@@ -13,18 +13,7 @@ mod api;
 #[tauri::command]
 async fn greet(name: &str) -> Result<String, String> {
     let api = ApiController::new();
-    let text = api
-        .request(ApiRequest::HackList {
-            page: 0,
-            gallery: false,
-        })
-        .await
-        .map_err(|err| err.to_string())?;
-
-    let html = Html::parse_document(&text);
-    let hacks = Hack::from_scraped_hack_lists(html);
-
-    info!("{:#?}", hacks);
+    info!("{:#?}", api.get_hack_list(0).await);
 
     Ok(format!("Hello, {}! You've been greeted from Rust!", name))
 }
