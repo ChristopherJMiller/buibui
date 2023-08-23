@@ -1,9 +1,10 @@
 use byte_unit::Byte;
 use chrono::NaiveDateTime;
 use scraper::{Html, Selector};
+use serde::{Deserialize, Serialize};
 
 /// The type of Hack, with Other being used as a fallback in case new types are added on the fly.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum HackType {
     StandardEasy,
     StandardNormal,
@@ -36,7 +37,8 @@ impl From<String> for HackType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 /// Represents a ROM Hack.
 pub struct Hack {
     /// Hack uid
@@ -63,10 +65,8 @@ pub struct Hack {
     pub size: Byte,
     /// Download URL
     pub download_url: String,
-    /// URLs to the screenshot images/gifs.
-    pub screenshot_urls: Vec<String>,
-    /// Hack Tags. Requires loading the main hack page to view, so be Nothing.
-    pub tags: Option<Vec<String>>,
+    /// Banner Screenshot URL
+    pub screenshot_url: String,
 }
 
 impl Hack {
@@ -289,8 +289,7 @@ impl Hack {
                     rating,
                     size,
                     download_url,
-                    screenshot_urls: vec![screenshot],
-                    tags: None,
+                    screenshot_url: screenshot,
                 }
             })
             .collect()
