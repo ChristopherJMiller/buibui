@@ -40,6 +40,12 @@ export function HackModal({ selectedHack, dismiss }: HackModalProps) {
     run();
   }, [selectedHack, setHackDetails]);
 
+  const addToCollection = async () => {
+    if (selectedHack && hackDetails) {
+      await invoke('add_hack', { base: selectedHack, details: hackDetails });
+    }
+  };
+
   const loadingElement = useMemo(
     () =>
       hackDetails === undefined ? (
@@ -57,13 +63,19 @@ export function HackModal({ selectedHack, dismiss }: HackModalProps) {
         <div className="flex flex-col justify-between h-full">
           <div className="gap-4 flex flex-col">
             <p>{hackDetails?.description}</p>
-            <div className="flex flex-row gap-4">
+            <div className="grid grid-cols-6 gap-2 my-3 text-xs text-bold">
               {hackDetails?.tags.map((tag) => (
-                <div className="p-1 px-2 bg-rose-800 rounded-xl">{tag}</div>
+                <div className="p-1 px-2 bg-rose-800 rounded-xl text-center self-center justify-center flex">
+                  {tag}
+                </div>
               ))}
             </div>
           </div>
-          <Button gradientDuoTone="purpleToBlue" outline>
+          <Button
+            gradientDuoTone="purpleToBlue"
+            outline
+            onClick={addToCollection}
+          >
             Add to Collection
           </Button>
         </div>

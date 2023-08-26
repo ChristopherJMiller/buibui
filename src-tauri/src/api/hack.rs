@@ -1,4 +1,3 @@
-use byte_unit::Byte;
 use chrono::NaiveDateTime;
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
@@ -61,8 +60,6 @@ pub struct Hack {
     pub authors: Vec<String>,
     /// Rating, if exists. usually 0..5.
     pub rating: Option<f32>,
-    /// Size of download
-    pub size: Byte,
     /// Download URL
     pub download_url: String,
     /// Banner Screenshot URL
@@ -231,18 +228,15 @@ impl Hack {
 
                 let rating: Option<f32> = rating.parse::<f32>().ok();
 
-                let size = children
-                    .next()
-                    .unwrap()
-                    .first_child()
-                    .unwrap()
-                    .value()
-                    .as_text()
-                    .unwrap()
-                    .to_string()
-                    .replace("\u{a0}", "");
-
-                let size = Byte::from_str(size).unwrap();
+                let _size = children.next();
+                //.unwrap()
+                //.first_child()
+                //.unwrap()
+                //.value()
+                //.as_text()
+                //.unwrap()
+                //.to_string()
+                //.replace("\u{a0}", "");
 
                 let download_url = children
                     .next()
@@ -287,7 +281,6 @@ impl Hack {
                     hack_type,
                     authors,
                     rating,
-                    size,
                     download_url,
                     screenshot_url: screenshot,
                 }

@@ -6,7 +6,6 @@ import { HackGalleryRow } from '../components/HackGalleryRow';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
-import { Modal } from 'flowbite-react';
 import { HackModal } from '../components/Modal';
 
 const CHUNK_SIZE = 5;
@@ -20,6 +19,14 @@ export default function Gallery() {
   const [loading, setLoading] = useState(false);
   const [hacks, setHacks] = useState<Hack[]>([]);
   const [selectedHack, setSelectedHack] = useState<Hack | undefined>(undefined);
+
+  useEffect(() => {
+    const run = async () => {
+      console.log(await invoke('hack_collection'));
+    };
+
+    run();
+  }, []);
 
   const fetchData = async (chunkIndex: number) => {
     setLoading(true);

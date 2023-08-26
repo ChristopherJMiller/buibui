@@ -1,7 +1,7 @@
 use hyper::header::USER_AGENT;
 use reqwest::Client;
 use scraper::Html;
-use tracing::info;
+use tracing::debug;
 
 use super::{Hack, HackDetails};
 
@@ -20,7 +20,7 @@ impl ApiController {
 
     async fn request(&self, req: ApiRequest) -> Result<String, reqwest::Error> {
         let query = req.query();
-        info!("{:?}", query);
+        debug!("{:?}", query);
         let text = self
             .client
             .get(Self::BASE_URL)
@@ -35,7 +35,7 @@ impl ApiController {
     }
 
     pub async fn get_hack_list(&self, page: u64) -> Result<Vec<Hack>, String> {
-        info!("List View Req");
+        debug!("List View Req");
         let list_view = self
             .request(ApiRequest::HackList {
                 page,
@@ -44,7 +44,7 @@ impl ApiController {
             .await
             .map_err(|err| err.to_string())?;
 
-        info!("Gallery View Req");
+        debug!("Gallery View Req");
         let gallery_view = self
             .request(ApiRequest::HackList {
                 page,
@@ -60,14 +60,14 @@ impl ApiController {
     }
 
     pub async fn get_hack_details(&self, id: u64) -> Result<HackDetails, String> {
-        info!("Details Req");
+        debug!("Details Req");
 
         let details = self
             .request(ApiRequest::HackDetails { id })
             .await
             .map_err(|err| err.to_string())?;
 
-        info!("Images Req");
+        debug!("Images Req");
         let images = self
             .request(ApiRequest::HackImages { id })
             .await

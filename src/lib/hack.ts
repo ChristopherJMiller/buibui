@@ -23,7 +23,6 @@ export interface Hack {
     hackType: HackType,
     authors: string[],
     rating?: number,
-    size: string,
     downloadUrl: string,
     screenshotUrl: string,
     tags?: string[],
