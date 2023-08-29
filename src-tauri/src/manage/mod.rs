@@ -23,6 +23,8 @@ pub enum BuibuiError {
     ZipError(#[from] zip::result::ZipError),
     #[error("download contained no patch file")]
     ContainedNoPatchFile,
+    #[error("error occured while patching ROM {0}")]
+    PatchingError(#[from] flips::Error),
     #[error("hack already existed in collection")]
     HackAlreadyExists,
 }

@@ -4,6 +4,7 @@ use std::{
     path::PathBuf,
 };
 
+use flips::{BpsOutput, FlipsMemory};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use url::Url;
@@ -14,14 +15,13 @@ use crate::{
     state::BuibuiState,
 };
 
-use super::BuibuiError;
+use super::{settings::Settings, BuibuiError};
 
 /// Represents a locally stored hack
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CollectedHack {
     pub crc: u32,
     pub cover_image_name: String,
-    pub patched: bool,
     #[serde(flatten)]
     pub base: Hack,
     #[serde(flatten)]
@@ -85,8 +85,14 @@ impl Collection {
 
         fs::create_dir(&hack_location)?;
 
-        let mut out_file = fs::File::create(hack_location.join("patch.bps"))?;
-        io::copy(&mut patch_file, &mut out_file)?;
+        let mut patch_buf = Vec::new();
+        io::copy(&mut patch_file, &mut patch_buf)?;
+        let rom = fs::read(Settings::rom_location()?)?;
+        let (_, rom) = rom.split_at(512);
+
+        let final_hack = flips::BpsPatch::new(patch_buf).apply(rom)?;
+
+        fs::write(hack_location.join("hack.smc"), final_hack.to_bytes())?;
 
         let url = Url::parse(&base.screenshot_url).unwrap();
         let collected_hack = CollectedHack {
@@ -94,7 +100,6 @@ impl Collection {
             cover_image_name: url.path_segments().unwrap().last().unwrap().to_string(),
             base,
             details,
-            patched: false,
         };
 
         fs::write(

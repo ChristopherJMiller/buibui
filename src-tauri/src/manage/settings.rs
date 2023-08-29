@@ -22,6 +22,23 @@ pub struct Settings {
 }
 
 impl Settings {
+    pub const ROM_NAME: &'static str = "smw.rom";
+
+    pub fn rom_location() -> Result<PathBuf, BuibuiError> {
+        Ok(PathBuf::from(Self::config_location()?).join(Self::ROM_NAME))
+    }
+
+    pub fn rom_present() -> Result<bool, BuibuiError> {
+        Ok(Self::rom_location()?.exists())
+    }
+
+    pub fn prepare_rom(rom_location: String) -> Result<bool, BuibuiError> {
+        let rom = fs::read(rom_location)?;
+        fs::write(Self::rom_location()?, rom)?;
+
+        Ok(true)
+    }
+
     /// Get location of configuration file.
     fn config_location() -> Result<String, BuibuiError> {
         get_app_root(AppDataType::UserConfig, &APP_INFO)

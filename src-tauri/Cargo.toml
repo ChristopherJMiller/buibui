@@ -1,8 +1,8 @@
 [package]
 name = "buibui"
 version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Bui Bui"
+authors = ["ChristopherJMiller"]
 license = ""
 repository = ""
 edition = "2021"
@@ -13,7 +13,7 @@ edition = "2021"
 tauri-build = { version = "1.4", features = [] }
 
 [dependencies]
-tauri = { version = "1.4", features = ["shell-open"] }
+tauri = { version = "1.4", features = ["dialog-open", "shell-open"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 reqwest = "0.11"
@@ -37,6 +37,7 @@ zip = { version = "0.6", default-features = false, features = [
 tokio = { version = "1", features = ["full"] }
 once_cell = "1"
 url = "2"
+flips = "0.2"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

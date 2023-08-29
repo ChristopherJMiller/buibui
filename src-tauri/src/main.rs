@@ -45,6 +45,16 @@ async fn add_hack(base: Hack, details: HackDetails) -> Result<CollectedHack, Str
         .map_err(|err| err.to_string())
 }
 
+#[tauri::command]
+fn rom_present() -> Result<bool, String> {
+    Settings::rom_present().map_err(|err| err.to_string())
+}
+
+#[tauri::command]
+fn prepare_rom(rom_location: String) -> Result<bool, String> {
+    Settings::prepare_rom(rom_location).map_err(|err| err.to_string())
+}
+
 fn main() {
     tracing_subscriber::fmt::init();
 
@@ -54,7 +64,9 @@ fn main() {
             get_hack_details,
             get_settings,
             hack_collection,
-            add_hack
+            add_hack,
+            rom_present,
+            prepare_rom
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
