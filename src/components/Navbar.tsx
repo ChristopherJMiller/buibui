@@ -28,6 +28,7 @@ export function Navbar() {
 
   const buttons = PATHS.map(([name, path]) => (
     <NavButton
+      key={path}
       name={name}
       path={path}
       active={location.pathname === path}

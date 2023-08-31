@@ -1,54 +1,29 @@
 import { Button, Modal } from 'flowbite-react';
-import { Hack, HackDetails } from '../lib/hack';
-import { useEffect, useMemo, useState } from 'react';
-import { invoke } from '@tauri-apps/api';
+import { useMemo, useState } from 'react';
+import { useAppDispatch, useModal } from '../lib/hooks';
+import { closeModal } from '../lib/modal';
 
-interface HackModalProps {
-  selectedHack?: Hack;
-  dismiss: () => void;
-}
-
-export function HackModal({ selectedHack, dismiss }: HackModalProps) {
-  const [hackDetails, setHackDetails] = useState<HackDetails | undefined>(
-    undefined
-  );
-
-  console.log(hackDetails);
-
+export function HackModal() {
+  const dispatch = useAppDispatch();
   const [currentImage, setCurrentImage] = useState(0);
+  const { selectedHack, details, collectHack, inCollection } = useModal();
 
-  const fetchSelectedHackDetails = async () => {
-    if (selectedHack) {
-      return (await invoke('get_hack_details', {
-        id: selectedHack.id,
-      })) as HackDetails;
+  const onClick = () => {
+    if (selectedHack && details) {
+      collectHack(dispatch, selectedHack, details);
     }
   };
 
-  useEffect(() => {
-    const run = async () => {
-      if (selectedHack) {
-        setCurrentImage(0);
-        setHackDetails(undefined);
-        const details = await fetchSelectedHackDetails();
-        if (details) {
-          setHackDetails(details);
-        }
-      }
-    };
+  const close = () => dispatch(closeModal());
 
-    run();
-  }, [selectedHack, setHackDetails]);
-
-  const addToCollection = async () => {
-    if (selectedHack && hackDetails) {
-      await invoke('add_hack', { base: selectedHack, details: hackDetails });
-    }
-  };
+  const buttonMessage = useMemo(
+    () => (inCollection ? 'In Collection' : 'Add to Collection'),
+    [inCollection]
+  );
 
   const loadingElement = useMemo(
     () =>
-      hackDetails === undefined ? (
+      details === undefined ? (
         <div className="flex flex-col justify-between h-full">
           <div className="flex flex-col gap-4">
             <div className="h-10 rounded-lg animate-pulse w-full bg-stone-600"></div>
@@ -62,10 +37,13 @@ export function HackModal({ selectedHack, dismiss }: HackModalProps) {
       ) : (
         <div className="flex flex-col justify-between h-full">
           <div className="gap-4 flex flex-col">
-            <p>{hackDetails?.description}</p>
+            <p>{details?.description}</p>
             <div className="grid grid-cols-6 gap-2 my-3 text-xs text-bold">
-              {hackDetails?.tags.map((tag) => (
-                <div className="p-1 px-2 bg-rose-800 rounded-xl text-center self-center justify-center flex">
+              {details?.tags.map((tag) => (
+                <div
+                  key={tag}
+                  className="p-1 px-2 bg-rose-800 rounded-xl text-center self-center justify-center flex"
+                >
                   {tag}
                 </div>
               ))}
@@ -74,23 +52,23 @@ export function HackModal({ selectedHack, dismiss }: HackModalProps) {
           <Button
             gradientDuoTone="purpleToBlue"
             outline
-            onClick={addToCollection}
+            disabled={inCollection}
+            onClick={onClick}
           >
-            Add to Collection
+            {buttonMessage}
           </Button>
         </div>
       ),
-    [hackDetails]
+    [details, inCollection]
   );
 
   const currentImageUrl = useMemo(
-    () =>
-      hackDetails?.screenshot_urls[currentImage] ?? selectedHack?.screenshotUrl,
-    [hackDetails, selectedHack, currentImage]
+    () => details?.screenshot_urls[currentImage] ?? selectedHack?.screenshotUrl,
+    [details, selectedHack, currentImage]
   );
 
   const imageTicker = useMemo(() => {
-    if (hackDetails) {
+    if (details) {
       const leftArrow = (
         <Button
           gradientDuoTone="purpleToBlue"
@@ -110,10 +88,10 @@ export function HackModal({ selectedHack, dismiss }: HackModalProps) {
           size="xs"
           pill
           outline
-          disabled={currentImage === hackDetails.screenshot_urls.length - 1}
+          disabled={currentImage === details.screenshot_urls.length - 1}
           onClick={() =>
             setCurrentImage(
-              Math.min(hackDetails.screenshot_urls.length, currentImage + 1)
+              Math.min(details.screenshot_urls.length, currentImage + 1)
             )
           }
         >
@@ -125,7 +103,7 @@ export function HackModal({ selectedHack, dismiss }: HackModalProps) {
         <div className="flex flex-row gap-2 items-center">
           {leftArrow}
           <div>
-            {currentImage + 1} of {hackDetails?.screenshot_urls.length}
+            {currentImage + 1} of {details?.screenshot_urls.length}
           </div>
           {rightArrow}
         </div>
@@ -135,13 +113,13 @@ export function HackModal({ selectedHack, dismiss }: HackModalProps) {
         <div className="h-8 rounded-xl animate-pulse w-24 bg-stone-600"></div>
       );
     }
-  }, [currentImage, hackDetails]);
+  }, [currentImage, details]);
 
   return (
     <Modal
       dismissible
       show={selectedHack !== undefined}
-      onClose={dismiss}
+      onClose={close}
       size={'6xl'}
     >
       <Modal.Header className="bg-stone-800 border-stone-800"></Modal.Header>

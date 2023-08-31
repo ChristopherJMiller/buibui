@@ -1,5 +1,4 @@
-import { invoke } from '@tauri-apps/api';
-import { CSSProperties, useEffect, useMemo, useState } from 'react';
+import { CSSProperties, useMemo } from 'react';
 import { Hack } from '../lib/hack';
 import { Loading } from '../components/Loading';
 import { HackGalleryRow } from '../components/HackGalleryRow';
@@ -7,6 +6,8 @@ import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { HackModal } from '../components/Modal';
+import { useAppDispatch, useGallery } from '../lib/hooks';
+import { openHack } from '../lib/modal';
 
 const CHUNK_SIZE = 5;
 
@@ -16,33 +17,8 @@ interface ColumnProps {
 }
 
 export default function Gallery() {
-  const [loading, setLoading] = useState(false);
-  const [hacks, setHacks] = useState<Hack[]>([]);
-  const [selectedHack, setSelectedHack] = useState<Hack | undefined>(undefined);
-
-  useEffect(() => {
-    const run = async () => {
-      console.log(await invoke('hack_collection'));
-    };
-
-    run();
-  }, []);
-
-  const fetchData = async (chunkIndex: number) => {
-    setLoading(true);
-    const newData: Hack[] = await invoke('get_hack_list', {
-      page: Math.floor((chunkIndex * 5) / 10),
-    });
-
-    const fullList = [...hacks, ...newData];
-
-    setHacks(fullList);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchData(0);
-  }, []);
+  const dispatch = useAppDispatch();
+  const { loading, hacks, fetchData } = useGallery();
 
   const hackChunks = useMemo(
     () =>
@@ -60,10 +36,7 @@ export default function Gallery() {
     [hacks]
   );
 
-  const isItemLoaded = (index: number) => {
-    console.log(index);
-    return hackChunks[index] !== undefined;
-  };
+  const isItemLoaded = (index: number) => hackChunks[index] !== undefined;
 
   const knownHackCount = useMemo(() => hackChunks.length + 10, [hacks]);
 
@@ -77,22 +50,19 @@ export default function Gallery() {
       key={hackChunks[index][0].id}
       hackRow={hackChunks[index]}
       style={style}
-      onHackSelected={(hack) => setSelectedHack(hack)}
+      onHackSelected={(hack) => dispatch(openHack(hack))}
     />
   );
 
   return (
     <div className="h-full">
-      <HackModal
-        selectedHack={selectedHack}
-        dismiss={() => setSelectedHack(undefined)}
-      />
+      <HackModal />
       <AutoSizer>
         {({ height, width }) => (
           <InfiniteLoader
             isItemLoaded={isItemLoaded}
             itemCount={knownHackCount}
-            loadMoreItems={fetchData}
+            loadMoreItems={(index) => fetchData(index)}
             minimumBatchSize={50}
             threshold={10}
           >

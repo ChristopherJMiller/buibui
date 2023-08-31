@@ -4,7 +4,6 @@ use std::{
     path::PathBuf,
 };
 
-use flips::{BpsOutput, FlipsMemory};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use url::Url;
@@ -19,6 +18,7 @@ use super::{settings::Settings, BuibuiError};
 
 /// Represents a locally stored hack
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct CollectedHack {
     pub crc: u32,
     pub cover_image_name: String,
@@ -47,11 +47,13 @@ impl Collection {
             .filter_map(|item| {
                 if let Ok(item) = item {
                     if item.file_type().unwrap().is_dir() {
-                        return CollectedHack::from_dir_path(item.path()).ok();
+                        CollectedHack::from_dir_path(item.path()).ok()
+                    } else {
+                        None
                     }
+                } else {
+                    None
                 }
-
-                None
             })
             .collect())
     }

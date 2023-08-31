@@ -8,6 +8,7 @@ use manage::{
     settings::Settings,
 };
 use state::BuibuiState;
+use tracing::info;
 
 mod api;
 mod manage;
