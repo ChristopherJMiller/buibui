@@ -1,6 +1,6 @@
 <div align="center">
     <img src="src-tauri/icons/32x32.png">
-    <span style="font-size: 32">Bui Bui</span>
+    <span style="font-size: 32"><b>Bui Bui</b></span>
 </div>
 <p align="center" style="text-align: center">A Cross Platform Super Mario World Hack Manager</p>
 <div align="center" style="justify-content: center; width: 100%; display: flex; align-items: center; gap: 10px;">
