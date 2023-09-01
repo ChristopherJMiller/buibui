@@ -1,9 +1,9 @@
-<div style="justify-content: center; width: 100%; display: flex; align-items: center; gap: 10px;">
+<div align="center">
     <img src="src-tauri/icons/32x32.png">
     <span style="font-size: 32">Bui Bui</span>
 </div>
-<p style="text-align: center">A Cross Platform Super Mario World Hack Manager</p>
-<div style="justify-content: center; width: 100%; display: flex; align-items: center; gap: 10px;">
+<p align="center" style="text-align: center">A Cross Platform Super Mario World Hack Manager</p>
+<div align="center" style="justify-content: center; width: 100%; display: flex; align-items: center; gap: 10px;">
 <img alt="GitHub release (with filter)" src="https://img.shields.io/github/v/release/ChristopherJMiller/buibui">
 <img alt="GitHub issues" src="https://img.shields.io/github/issues/ChristopherJMiller/buibui">
 
