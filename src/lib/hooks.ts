@@ -43,6 +43,7 @@ export const useCollection = () => {
 };
 
 const fetchGalleryData = async (dispatch: AppDispatch, chunkIndex: number) => {
+    console.log(chunkIndex)
     try {
         dispatch(markGalleryLoading());
         const newData: Hack[] = await invoke('get_hack_list', {
@@ -111,8 +112,6 @@ export const useModal = (): ModalContext => {
             return false;
         }
     }, [collection, state.selectedHack]);
-
-    console.log(inCollection);
 
     const details = useMemo(() => {
         return state.selectedHack ? galleryDetails[state.selectedHack.id] : undefined;

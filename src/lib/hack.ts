@@ -109,7 +109,13 @@ const hackSlice = createSlice({
             state.galleryStarted = true;
         },
         appendGalleryHacks: (state, action: PayloadAction<Hack[]>) => {
-            state.gallery = state.gallery.concat(action.payload);
+            // TODO this is kinda costly, and but is only O(n) at least.
+            const inGallery = state.gallery.findIndex((hack) => hack.id === action.payload[0].id);
+
+            if (inGallery === -1) {
+                state.gallery = state.gallery.concat(action.payload);
+            }
+
             state.galleryLoading = false;
         },
         populateHackDetail: (state, action: PayloadAction<IdHackDetails>) => {
