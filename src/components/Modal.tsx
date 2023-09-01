@@ -2,11 +2,14 @@ import { Button, Modal } from 'flowbite-react';
 import { useMemo, useState } from 'react';
 import { useAppDispatch, useModal } from '../lib/hooks';
 import { closeModal } from '../lib/modal';
+import { invoke } from '@tauri-apps/api';
+import { displayHackType } from '../lib/hack';
 
 export function HackModal() {
   const dispatch = useAppDispatch();
   const [currentImage, setCurrentImage] = useState(0);
-  const { selectedHack, details, collectHack, inCollection } = useModal();
+  const { selectedHack, details, collectHack, inCollection, galleryLoading } =
+    useModal();
 
   const onClick = () => {
     if (selectedHack && details) {
@@ -14,12 +17,34 @@ export function HackModal() {
     }
   };
 
+  const play = () => {
+    if (selectedHack && inCollection) {
+      invoke('launch_hack', { id: selectedHack.id });
+    }
+  };
+
   const close = () => dispatch(closeModal());
 
-  const buttonMessage = useMemo(
-    () => (inCollection ? 'In Collection' : 'Add to Collection'),
-    [inCollection]
-  );
+  const button = useMemo(() => {
+    if (inCollection) {
+      return (
+        <Button gradientDuoTone="purpleToBlue" outline onClick={play}>
+          Launch Hack
+        </Button>
+      );
+    } else {
+      return (
+        <Button
+          gradientDuoTone="purpleToBlue"
+          outline
+          disabled={galleryLoading}
+          onClick={onClick}
+        >
+          Add to Collection
+        </Button>
+      );
+    }
+  }, [inCollection, selectedHack, galleryLoading]);
 
   const loadingElement = useMemo(
     () =>
@@ -49,14 +74,7 @@ export function HackModal() {
               ))}
             </div>
           </div>
-          <Button
-            gradientDuoTone="purpleToBlue"
-            outline
-            disabled={inCollection}
-            onClick={onClick}
-          >
-            {buttonMessage}
-          </Button>
+          {button}
         </div>
       ),
     [details, inCollection]
@@ -115,6 +133,11 @@ export function HackModal() {
     }
   }, [currentImage, details]);
 
+  const hackType = useMemo(
+    () => displayHackType(selectedHack?.hackType),
+    [selectedHack]
+  );
+
   return (
     <Modal
       dismissible
@@ -129,7 +152,10 @@ export function HackModal() {
           {imageTicker}
         </div>
         <div className="flex flex-col gap-4 basis-2/3">
-          <h1 className="text-2xl">{selectedHack?.name}</h1>
+          <div>
+            <h1 className="text-2xl">{selectedHack?.name}</h1>
+            <h2 className="italic text-lg">{hackType}</h2>
+          </div>
           {loadingElement}
         </div>
       </Modal.Body>

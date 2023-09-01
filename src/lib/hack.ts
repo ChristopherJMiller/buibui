@@ -13,6 +13,22 @@ export enum HackType {
     Troll = "Troll",
 }
 
+export function displayHackType(type?: HackType): String {
+    switch(type) {
+        case HackType.StandardEasy: return "Standard: Easy";
+        case HackType.StandardNormal: return "Standard: Normal";
+        case HackType.StandardHard: return "Standard: Hard";
+        case HackType.StandardVeryHard: return "Standard: Very Hard";
+        case HackType.KaizoBeginner: return "Kaizo: Beginner";
+        case HackType.KaizoIntermediate: return "Kaizo: Intermediate";
+        case HackType.KaizoExpert: return "Kaizo: Expert";
+        case HackType.TASKaizo: return "TAS: Kaizo";
+        case HackType.TASPit: return "TAS: Pit";
+        case HackType.Troll: return "Troll";
+        default: return "Difficulty N/a";
+    }
+}
+
 export interface Hack {
     id: number,
     name: string,

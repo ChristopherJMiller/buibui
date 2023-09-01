@@ -3,6 +3,7 @@ use hyper::StatusCode;
 use thiserror::Error;
 
 pub mod collection;
+pub mod emulator;
 pub mod settings;
 
 #[derive(Error, Debug)]
@@ -27,4 +28,6 @@ pub enum BuibuiError {
     PatchingError(#[from] flips::Error),
     #[error("hack already existed in collection")]
     HackAlreadyExists,
+    #[error("no emulators avaliable to run gacks")]
+    NoEmulatorAvaliable,
 }

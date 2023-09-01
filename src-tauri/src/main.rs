@@ -5,10 +5,10 @@ use crate::api::Hack;
 use api::{ApiController, HackDetails};
 use manage::{
     collection::{CollectedHack, Collection},
+    emulator,
     settings::Settings,
 };
 use state::BuibuiState;
-use tracing::info;
 
 mod api;
 mod manage;
@@ -56,6 +56,19 @@ fn prepare_rom(rom_location: String) -> Result<bool, String> {
     Settings::prepare_rom(rom_location).map_err(|err| err.to_string())
 }
 
+#[tauri::command]
+async fn launch_hack(id: u64) -> Result<(), String> {
+    let hack_location = BuibuiState::read()
+        .await
+        .settings
+        .hack_dir_location()
+        .join(id.to_string())
+        .join("hack.smc");
+
+    emulator::launch_hack(hack_location.to_string_lossy().to_string())
+        .map_err(|err| err.to_string())
+}
+
 fn main() {
     tracing_subscriber::fmt::init();
 
@@ -67,7 +80,8 @@ fn main() {
             hack_collection,
             add_hack,
             rom_present,
-            prepare_rom
+            prepare_rom,
+            launch_hack
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
